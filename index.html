@@ -1,0 +1,65 @@
+<title>DevTools 协议查看器</title>
+
+<!-- FAVICONS -->
+<link rel="apple-touch-icon" sizes="180x180" href="./favicons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="./favicons/favicon-16x16.png">
+<link rel="manifest" href="./favicons/site.webmanifest">
+<link rel="shortcut icon" href="./favicons/favicon.ico">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="msapplication-config" content="./favicons/browserconfig.xml">
+<meta name="theme-color" content="#ffffff">
+
+<link rel="stylesheet" href="./style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="search.js"></script>
+<script src="utilities.js"></script>
+<script src="fuzzy_search.js"></script>
+<script src="protocol_renderer.js"></script>
+<script src="main.js"></script>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-138239427-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-138239427-1');
+</script>
+
+<section id='content'>
+</section>
+<section id='sresults'></section>
+<section id='search'>
+  <input type="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="开始输入以搜索..."></input>
+  <span id='experimental'>
+    <img id='experimental-on' src='ic_check_box_black_24px.svg'/>
+    <img id='experimental-off' src='ic_check_box_outline_blank_black_24px.svg'/>
+      实验性</span>
+  <a href="https://github.com/aslushnikov/vanilla-protocol-viewer/">
+    <img class='toolbar-button github' src='github.png'></img>
+  </a>
+  <img class='toolbar-button home' src='home.svg'></img>
+</section>
+<section id='sidebar'></section>
+<template id='landing'>
+  <div class='box box-content'>
+    <h1>Vanilla CDP协议查看器[中文版]</h1>
+    <p>
+    <strong>Chrome DevTools 协议</strong> 允许工具对 Chromium、Chrome 及其他基于 Blink 的浏览器进行自动化、检查、调试和性能分析。许多现有项目 <a href='https://developer.chrome.com/devtools/docs/debugging-clients'>目前正在使用</a> 该协议。
+    <a href='https://developers.google.com/web/tools/chrome-devtools/'>Chrome DevTools</a> 也使用此协议，并由团队维护其 API。
+    </p>
+    <p>
+    协议分为多个领域（如 DOM、Debugger、Network 等）。每个领域定义了它支持的若干命令和产生的事件。命令和事件都是结构固定的 JSON 对象。你可以 <a href='https://developer.chrome.com/devtools/docs/debugger-protocol'>直接通过原始消息进行调试</a>，也可以使用
+    <a href='https://developer.chrome.com/devtools/docs/debugger-protocol#extension'>扩展 JavaScript API</a>。
+    </p>
+
+    <h3>查看器功能</h3>
+    <ul>
+      <li><code>极快</code> 搜索和页面渲染无需与服务器交互。
+      <li><code>即时搜索</code> 随时输入即可启动 <strong>模糊搜索</strong>。
+      <li><code>无需构建</code> 纯原生 JavaScript / HTML / CSS 编写。零依赖，完全自包含。
+    </ul>
+    灵感来自 <a href='https://chromedevtools.github.io/devtools-protocol/'>Chrome DevTools 协议查看器</a>。
+  </div>
+</template>
