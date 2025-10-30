@@ -1,0 +1,3810 @@
+{
+  "version": {
+    "major": "1",
+    "minor": "3"
+  },
+  "domains": [
+    {
+      "domain": "Console",
+      "description": "该域已废弃 - 请改用 Runtime 或 Log。",
+      "deprecated": true,
+      "dependencies": [
+        "Runtime"
+      ],
+      "types": [
+        {
+          "id": "ConsoleMessage",
+          "description": "控制台消息。",
+          "type": "object",
+          "properties": [
+            {
+              "name": "source",
+              "description": "消息来源。",
+              "type": "string",
+              "enum": [
+                "xml",
+                "javascript",
+                "network",
+                "console-api",
+                "storage",
+                "appcache",
+                "rendering",
+                "security",
+                "other",
+                "deprecation",
+                "worker"
+              ]
+            },
+            {
+              "name": "level",
+              "description": "消息严重级别。",
+              "type": "string",
+              "enum": [
+                "log",
+                "warning",
+                "error",
+                "debug",
+                "info"
+              ]
+            },
+            {
+              "name": "text",
+              "description": "消息文本。",
+              "type": "string"
+            },
+            {
+              "name": "url",
+              "description": "消息来源的URL。",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "line",
+              "description": "此生成消息的资源中的行号（从1开始）。",
+              "optional": true,
+              "type": "integer"
+            },
+            {
+              "name": "column",
+              "description": "此生成消息的资源中的列号（从1开始）。",
+              "optional": true,
+              "type": "integer"
+            }
+          ]
+        }
+      ],
+      "commands": [
+        {
+          "name": "clearMessages",
+          "description": "无操作。"
+        },
+        {
+          "name": "disable",
+          "description": "取消控制台域，阻止后续控制台消息上报到客户端。"
+        },
+        {
+          "name": "enable",
+          "description": "启用控制台域，将目前收集到的消息通过\n`消息已添加`通知。"
+        }
+      ],
+      "events": [
+        {
+          "name": "messageAdded",
+          "description": "当添加控制台消息时触发。",
+          "parameters": [
+            {
+              "name": "message",
+              "description": "已添加的控制台消息。",
+              "$ref": "ConsoleMessage"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "domain": "Debugger",
+      "description": "调试器域提供 JavaScript 调试能力，支持设置/删除断点、单步执行、查看调用栈等。",
+      "dependencies": [
+        "Runtime"
+      ],
+      "types": [
+        {
+          "id": "BreakpointId",
+          "description": "断点标识符。",
+          "type": "string"
+        },
+        {
+          "id": "CallFrameId",
+          "description": "调用帧标识符。",
+          "type": "string"
+        },
+        {
+          "id": "Location",
+          "description": "源代码中的位置。",
+          "type": "object",
+          "properties": [
+            {
+              "name": "scriptId",
+              "description": "脚本标识符，来自 `Debugger.scriptParsed`。",
+              "$ref": "Runtime.ScriptId"
+            },
+            {
+              "name": "lineNumber",
+              "description": "主演中的行号（从0开始）。",
+              "type": "integer"
+            },
+            {
+              "name": "columnNumber",
+              "description": "主演中的列号（从0开始）。",
+              "optional": true,
+              "type": "integer"
+            }
+          ]
+        },
+        {
+          "id": "ScriptPosition",
+          "description": "源代码中的位置。",
+          "experimental": true,
+          "type": "object",
+          "properties": [
+            {
+              "name": "lineNumber",
+              "type": "integer"
+            },
+            {
+              "name": "columnNumber",
+              "type": "integer"
+            }
+          ]
+        },
+        {
+          "id": "LocationRange",
+          "description": "单体香料的范围。",
+          "experimental": true,
+          "type": "object",
+          "properties": [
+            {
+              "name": "scriptId",
+              "$ref": "Runtime.ScriptId"
+            },
+            {
+              "name": "start",
+              "$ref": "ScriptPosition"
+            },
+            {
+              "name": "end",
+              "$ref": "ScriptPosition"
+            }
+          ]
+        },
+        {
+          "id": "CallFrame",
+          "description": "JavaScript 调用帧。调用帧转发调用栈。",
+          "type": "object",
+          "properties": [
+            {
+              "name": "callFrameId",
+              "description": "该标识符仅在虚拟机暂停时有效。",
+              "$ref": "CallFrameId"
+            },
+            {
+              "name": "functionName",
+              "description": "此调用帧中调用的 JavaScript 函数名称。",
+              "type": "string"
+            },
+            {
+              "name": "functionLocation",
+              "description": "源代码中的位置。",
+              "optional": true,
+              "$ref": "Location"
+            },
+            {
+              "name": "location",
+              "description": "源代码中的位置。",
+              "$ref": "Location"
+            },
+            {
+              "name": "url",
+              "description": "JavaScript 脚本名称或 url。\n已弃用，转而使用“location.scriptId”通过之前的方法解析 URL\n发送 `Debugger.scriptParsed` 事件。",
+              "deprecated": true,
+              "type": "string"
+            },
+            {
+              "name": "scopeChain",
+              "description": "这里调用帧的作用域链。",
+              "type": "array",
+              "items": {
+                "$ref": "Scope"
+              }
+            },
+            {
+              "name": "this",
+              "description": "这里调用帧的`this`对象。",
+              "$ref": "Runtime.RemoteObject"
+            },
+            {
+              "name": "returnValue",
+              "description": "如果函数有返回点，则为返回的值。",
+              "optional": true,
+              "$ref": "Runtime.RemoteObject"
+            },
+            {
+              "name": "canBeRestarted",
+              "description": "仅当虚拟机暂停时有效，指示此帧是否\n可以重启也可以不重启。请注意，这里的“true”值并不\n保证带有此 CallFrameId 的 Debugger#restartFrame 将\n成功了，但是可能性很大。",
+              "experimental": true,
+              "optional": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        {
+          "id": "Scope",
+          "description": "作用域描述。",
+          "type": "object",
+          "properties": [
+            {
+              "name": "type",
+              "description": "作用域类型。",
+              "type": "string",
+              "enum": [
+                "global",
+                "local",
+                "with",
+                "closure",
+                "catch",
+                "block",
+                "script",
+                "eval",
+                "module",
+                "wasm-expression-stack"
+              ]
+            },
+            {
+              "name": "object",
+              "description": "代表范围的对象。对于“global”和“with”范围，它代表实际的\n对象；对于其余的范围，它是人工瞬态对象枚举范围\n变量作为其属性。",
+              "$ref": "Runtime.RemoteObject"
+            },
+            {
+              "name": "name",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "startLocation",
+              "description": "作用域在源代码中的起始位置",
+              "optional": true,
+              "$ref": "Location"
+            },
+            {
+              "name": "endLocation",
+              "description": "作用域在源代码中的结束位置",
+              "optional": true,
+              "$ref": "Location"
+            }
+          ]
+        },
+        {
+          "id": "SearchMatch",
+          "description": "资源的搜索匹配。",
+          "type": "object",
+          "properties": [
+            {
+              "name": "lineNumber",
+              "description": "资源内容中的行号。",
+              "type": "number"
+            },
+            {
+              "name": "lineContent",
+              "description": "包含匹配内容的行。",
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "id": "BreakLocation",
+          "type": "object",
+          "properties": [
+            {
+              "name": "scriptId",
+              "description": "脚本标识符，来自 `Debugger.scriptParsed`。",
+              "$ref": "Runtime.ScriptId"
+            },
+            {
+              "name": "lineNumber",
+              "description": "主演中的行号（从0开始）。",
+              "type": "integer"
+            },
+            {
+              "name": "columnNumber",
+              "description": "主演中的列号（从0开始）。",
+              "optional": true,
+              "type": "integer"
+            },
+            {
+              "name": "type",
+              "optional": true,
+              "type": "string",
+              "enum": [
+                "debuggerStatement",
+                "call",
+                "return"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "WasmDisassemblyChunk",
+          "experimental": true,
+          "type": "object",
+          "properties": [
+            {
+              "name": "lines",
+              "description": "下一个反汇编的行。",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "bytecodeOffsets",
+              "description": "描述每行起始位置的字节码偏移。",
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          ]
+        },
+        {
+          "id": "ScriptLanguage",
+          "description": "语言脚本的枚举。",
+          "type": "string",
+          "enum": [
+            "JavaScript",
+            "WebAssembly"
+          ]
+        },
+        {
+          "id": "DebugSymbols",
+          "description": "适用于 wasm 脚本的调试符号。",
+          "type": "object",
+          "properties": [
+            {
+              "name": "type",
+              "description": "编译符号类型。",
+              "type": "string",
+              "enum": [
+                "SourceMap",
+                "EmbeddedDWARF",
+                "ExternalDWARF"
+              ]
+            },
+            {
+              "name": "externalURL",
+              "description": "外部符号源的URL。",
+              "optional": true,
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "id": "ResolvedBreakpoint",
+          "type": "object",
+          "properties": [
+            {
+              "name": "breakpointId",
+              "description": "断唯一点标识符。",
+              "$ref": "BreakpointId"
+            },
+            {
+              "name": "location",
+              "description": "实际断点位置。",
+              "$ref": "Location"
+            }
+          ]
+        }
+      ],
+      "commands": [
+        {
+          "name": "continueToLocation",
+          "description": "继续执行直到到达指定位置。",
+          "parameters": [
+            {
+              "name": "location",
+              "description": "继续执行到的位置。",
+              "$ref": "Location"
+            },
+            {
+              "name": "targetCallFrames",
+              "optional": true,
+              "type": "string",
+              "enum": [
+                "any",
+                "current"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "disable",
+          "description": "为指定页面禁用调试器。"
+        },
+        {
+          "name": "enable",
+          "description": "为给定页面启用调试器。客户不应假设调试已经完成\n启用直到收到该命令的结果。",
+          "parameters": [
+            {
+              "name": "maxScriptsCacheSize",
+              "description": "收集的脚本的最大大小（不被其他堆对象引用）\n调试器可以保存。如果省略参数则不施加限制。",
+              "experimental": true,
+              "optional": true,
+              "type": "number"
+            }
+          ],
+          "returns": [
+            {
+              "name": "debuggerId",
+              "description": "调试器的唯一标识符。",
+              "experimental": true,
+              "$ref": "Runtime.UniqueDebuggerId"
+            }
+          ]
+        },
+        {
+          "name": "evaluateOnCallFrame",
+          "description": "在指定调用帧上求值表达式。",
+          "parameters": [
+            {
+              "name": "callFrameId",
+              "description": "用于寻求价值的调用帧标识符。",
+              "$ref": "CallFrameId"
+            },
+            {
+              "name": "expression",
+              "description": "要求值的表达式。",
+              "type": "string"
+            },
+            {
+              "name": "objectGroup",
+              "description": "将结果放入的字符串对象组名称（允许快速释放结果对象句柄\n使用“releaseObjectGroup”）。",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "includeCommandLineAPI",
+              "description": "指定命令行 API 是否应可用于计算的表达式，默认值\n为假。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "silent",
+              "description": "在静默模式下，不会报告评估期间引发的异常，也不会暂停\n执行。覆盖 `setPauseOnException` 状态。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "returnByValue",
+              "description": "结果是否为预期应按值发送的 JSON 对象。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "generatePreview",
+              "description": "是否为结果生成预览。",
+              "experimental": true,
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "throwOnSideEffect",
+              "description": "若在求值期间无法排除故障，是否引发异常。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "timeout",
+              "description": "在超时后终止执行（毫秒）。",
+              "experimental": true,
+              "optional": true,
+              "$ref": "Runtime.TimeDelta"
+            }
+          ],
+          "returns": [
+            {
+              "name": "result",
+              "description": "寻求价值结果的对象封装。",
+              "$ref": "Runtime.RemoteObject"
+            },
+            {
+              "name": "exceptionDetails",
+              "description": "异常详情。",
+              "optional": true,
+              "$ref": "Runtime.ExceptionDetails"
+            }
+          ]
+        },
+        {
+          "name": "getPossibleBreakpoints",
+          "description": "返回断点的可能位置。开始和结束范围位置中的 scriptId 应该是\n一样的。",
+          "parameters": [
+            {
+              "name": "start",
+              "description": "找到可能断点位置的范围起点。",
+              "$ref": "Location"
+            },
+            {
+              "name": "end",
+              "description": "搜索可能断点位置的范围结束（不包括）。当未指定时，结束\n脚本的数量用作范围末尾。",
+              "optional": true,
+              "$ref": "Location"
+            },
+            {
+              "name": "restrictToFunction",
+              "description": "唯一考虑与起点有一个相同（非预览）函数内部的位置。",
+              "optional": true,
+              "type": "boolean"
+            }
+          ],
+          "returns": [
+            {
+              "name": "locations",
+              "description": "可能的断点位置列表。",
+              "type": "array",
+              "items": {
+                "$ref": "BreakLocation"
+              }
+            }
+          ]
+        },
+        {
+          "name": "getScriptSource",
+          "description": "返回指定脚本ID的来源代码。",
+          "parameters": [
+            {
+              "name": "scriptId",
+              "description": "要获取其源代码的脚本的 ID。",
+              "$ref": "Runtime.ScriptId"
+            }
+          ],
+          "returns": [
+            {
+              "name": "scriptSource",
+              "description": "脚本源（如果是 Wasm 字节码则为空）。",
+              "type": "string"
+            },
+            {
+              "name": "bytecode",
+              "description": "Wasm 字节码。 （通过 JSON 传递时编码为 base64 字符串）",
+              "optional": true,
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "name": "disassembleWasmModule",
+          "experimental": true,
+          "parameters": [
+            {
+              "name": "scriptId",
+              "description": "要反汇编的脚本的 ID",
+              "$ref": "Runtime.ScriptId"
+            }
+          ],
+          "returns": [
+            {
+              "name": "streamId",
+              "description": "对于大型模块，返回一个流，其中附加块\n可以依次阅读反汇编。",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "totalNumberOfLines",
+              "description": "反汇编文本中的总行数。",
+              "type": "integer"
+            },
+            {
+              "name": "functionBodyOffsets",
+              "description": "所有函数体的偏移量，格式为 [start1, end1,\nstart2, end2, ...] 其中所有结束都是互斥的。",
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            {
+              "name": "chunk",
+              "description": "拆解的第一块。",
+              "$ref": "WasmDisassemblyChunk"
+            }
+          ]
+        },
+        {
+          "name": "nextWasmDisassemblyChunk",
+          "description": "反汇编对应于模块的下一个块行\n流。如果反汇编完成，该API将使streamId失效\n并返回一个空块。对现在无效的流的任何后续调用\n将返回错误。",
+          "experimental": true,
+          "parameters": [
+            {
+              "name": "streamId",
+              "type": "string"
+            }
+          ],
+          "returns": [
+            {
+              "name": "chunk",
+              "description": "下一个拆卸部分。",
+              "$ref": "WasmDisassemblyChunk"
+            }
+          ]
+        },
+        {
+          "name": "getWasmBytecode",
+          "description": "该命令已被弃用。请改用 getScriptSource。",
+          "deprecated": true,
+          "parameters": [
+            {
+              "name": "scriptId",
+              "description": "要获取其源代码的 Wasm 脚本的 ID。",
+              "$ref": "Runtime.ScriptId"
+            }
+          ],
+          "returns": [
+            {
+              "name": "bytecode",
+              "description": "脚本来源。 （通过 JSON 传递时编码为 base64 字符串）",
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "name": "getStackTrace",
+          "description": "返回具有给定“stackTraceId”的堆栈跟踪。",
+          "experimental": true,
+          "parameters": [
+            {
+              "name": "stackTraceId",
+              "$ref": "Runtime.StackTraceId"
+            }
+          ],
+          "returns": [
+            {
+              "name": "stackTrace",
+              "$ref": "Runtime.StackTrace"
+            }
+          ]
+        },
+        {
+          "name": "pause",
+          "description": "在下一个 JavaScript 语句处停止。"
+        },
+        {
+          "name": "pauseOnAsyncCall",
+          "experimental": true,
+          "deprecated": true,
+          "parameters": [
+            {
+              "name": "parentStackTraceId",
+              "description": "当启动具有给定堆栈跟踪的异步调用时，调试器将暂停。",
+              "$ref": "Runtime.StackTraceId"
+            }
+          ]
+        },
+        {
+          "name": "removeBreakpoint",
+          "description": "删除 JavaScript 断点。",
+          "parameters": [
+            {
+              "name": "breakpointId",
+              "$ref": "BreakpointId"
+            }
+          ]
+        },
+        {
+          "name": "restartFrame",
+          "description": "从头开始重新启动特定的调用框架。旧的，已弃用\n`restartFrame` 的行为是保持暂停并允许进一步的 CDP 命令\n安排重新启动后。这可能会导致重新启动时出现问题，因此\n我们现在在安排后立即继续执行，直到我们\n到达重新启动的帧的开头。\n\n为了保持向后兼容，“restartFrame”现在需要一个“mode”\n参数存在。如果缺少“mode”参数，则“restartFrame”\n错误输出。\n\n各种返回值已被弃用，并且“callFrames”始终为空。\n使用“Debugger#paused”事件中的调用帧来代替，该事件会触发\n一旦 V8 在重新启动的函数开始时暂停。",
+          "parameters": [
+            {
+              "name": "callFrameId",
+              "description": "用于寻求价值的调用帧标识符。",
+              "$ref": "CallFrameId"
+            },
+            {
+              "name": "mode",
+              "description": "“mode”参数必须存在并设置为“StepInto”，否则\n`restartFrame`将会出错。",
+              "experimental": true,
+              "optional": true,
+              "type": "string",
+              "enum": [
+                "StepInto"
+              ]
+            }
+          ],
+          "returns": [
+            {
+              "name": "callFrames",
+              "description": "新的堆栈跟踪。",
+              "deprecated": true,
+              "type": "array",
+              "items": {
+                "$ref": "CallFrame"
+              }
+            },
+            {
+              "name": "asyncStackTrace",
+              "description": "异步调用栈（如果有）。",
+              "deprecated": true,
+              "optional": true,
+              "$ref": "Runtime.StackTrace"
+            },
+            {
+              "name": "asyncStackTraceId",
+              "description": "异步调用栈（如果有）。",
+              "deprecated": true,
+              "optional": true,
+              "$ref": "Runtime.StackTraceId"
+            }
+          ]
+        },
+        {
+          "name": "resume",
+          "description": "恢复 JavaScript 执行。",
+          "parameters": [
+            {
+              "name": "terminateOnResume",
+              "description": "设置为 true 可在恢复执行时终止执行。相比之下\nRuntime.terminateExecution，这将允许进一步执行\nJavaScript（即通过求值）直到执行暂停的代码\n实际上是恢复的，此时触发终止。\n如果当前未暂停执行，则此参数无效。",
+              "optional": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        {
+          "name": "searchInContent",
+          "description": "在脚本内容中搜索给定字符串。",
+          "parameters": [
+            {
+              "name": "scriptId",
+              "description": "要搜索的脚本的 ID。",
+              "$ref": "Runtime.ScriptId"
+            },
+            {
+              "name": "query",
+              "description": "要搜索的字符串。",
+              "type": "string"
+            },
+            {
+              "name": "caseSensitive",
+              "description": "如果为 true，则搜索区分大小写。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "isRegex",
+              "description": "如果为 true，则将字符串参数视为正则表达式。",
+              "optional": true,
+              "type": "boolean"
+            }
+          ],
+          "returns": [
+            {
+              "name": "result",
+              "description": "搜索匹配列表。",
+              "type": "array",
+              "items": {
+                "$ref": "SearchMatch"
+              }
+            }
+          ]
+        },
+        {
+          "name": "setAsyncCallStackDepth",
+          "description": "启用或禁用异步调用堆栈跟踪。",
+          "parameters": [
+            {
+              "name": "maxDepth",
+              "description": "异步调用堆栈的最大深度。设置为“0”将有效禁用异步收集\n调用堆栈（默认）。",
+              "type": "integer"
+            }
+          ]
+        },
+        {
+          "name": "setBlackboxExecutionContexts",
+          "description": "用传递的黑盒执行上下文替换以前的黑盒执行上下文。强制后端跳过\n在这些执行上下文中的脚本中步进/暂停。 VM将尝试通过以下方式留下黑盒脚本\n多次执行“step in”，如果不成功，最后诉诸“step out”。",
+          "experimental": true,
+          "parameters": [
+            {
+              "name": "uniqueIds",
+              "description": "供调试器忽略的执行上下文唯一 ID 数组。",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        {
+          "name": "setBlackboxPatterns",
+          "description": "用通过的黑盒模式替换以前的黑盒模式。强制后端跳过步进/暂停\nurl 与其中一种模式匹配的脚本。 VM将尝试通过以下方式留下黑盒脚本\n多次执行“step in”，如果不成功，最后诉诸“step out”。",
+          "experimental": true,
+          "parameters": [
+            {
+              "name": "patterns",
+              "description": "将用于检查黑盒状态的脚本 url 的正则表达式数组。",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "skipAnonymous",
+              "description": "如果为 true，则还忽略没有源 url 的脚本。",
+              "optional": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        {
+          "name": "setBlackboxedRanges",
+          "description": "使后端跳过脚本中黑框范围内的步骤。虚拟机将尝试离开黑名单\n通过多次执行“step in”来修改脚本，如果不成功，最后诉诸“step out”。\nPositions 数组包含黑盒状态发生更改的位置。第一个间隔不是\n黑匣子。数组应该是排序的。",
+          "experimental": true,
+          "parameters": [
+            {
+              "name": "scriptId",
+              "description": "脚本的 ID。",
+              "$ref": "Runtime.ScriptId"
+            },
+            {
+              "name": "positions",
+              "type": "array",
+              "items": {
+                "$ref": "ScriptPosition"
+              }
+            }
+          ]
+        },
+        {
+          "name": "setBreakpoint",
+          "description": "在给定位置设置 JavaScript 断点。",
+          "parameters": [
+            {
+              "name": "location",
+              "description": "设置断点的位置。",
+              "$ref": "Location"
+            },
+            {
+              "name": "condition",
+              "description": "用作断点条件的表达式。指定后，调试器将仅停止在\n如果该表达式的计算结果为 true，则断点。",
+              "optional": true,
+              "type": "string"
+            }
+          ],
+          "returns": [
+            {
+              "name": "breakpointId",
+              "description": "创建的断点的 ID 以供进一步参考。",
+              "$ref": "BreakpointId"
+            },
+            {
+              "name": "actualLocation",
+              "description": "该断点解析到的位置。",
+              "$ref": "Location"
+            }
+          ]
+        },
+        {
+          "name": "setInstrumentationBreakpoint",
+          "description": "设置仪器断点。",
+          "parameters": [
+            {
+              "name": "instrumentation",
+              "description": "仪器名称。",
+              "type": "string",
+              "enum": [
+                "beforeScriptExecution",
+                "beforeScriptWithSourceMapExecution"
+              ]
+            }
+          ],
+          "returns": [
+            {
+              "name": "breakpointId",
+              "description": "创建的断点的 ID 以供进一步参考。",
+              "$ref": "BreakpointId"
+            }
+          ]
+        },
+        {
+          "name": "setBreakpointByUrl",
+          "description": "在 URL 或 URL 正则表达式指定的给定位置设置 JavaScript 断点。一旦这个\n发出命令后，所有现有的已解析脚本将解析断点并返回\n`locations` 属性。进一步匹配脚本解析将得到后续的结果\n已发出“breakpointResolved”事件。该逻辑断点将在页面重新加载后继续存在。",
+          "parameters": [
+            {
+              "name": "lineNumber",
+              "description": "设置断点的行号。",
+              "type": "integer"
+            },
+            {
+              "name": "url",
+              "description": "要设置断点的资源的 URL。",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "urlRegex",
+              "description": "要设置断点的资源 URL 的正则表达式模式。 “url”或\n必须指定“urlRegex”。",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "scriptHash",
+              "description": "要设置断点的资源的脚本哈希。",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "columnNumber",
+              "description": "要设置断点的行的偏移​​量。",
+              "optional": true,
+              "type": "integer"
+            },
+            {
+              "name": "condition",
+              "description": "用作断点条件的表达式。指定后，调试器将仅停止在\n如果该表达式的计算结果为 true，则断点。",
+              "optional": true,
+              "type": "string"
+            }
+          ],
+          "returns": [
+            {
+              "name": "breakpointId",
+              "description": "创建的断点的 ID 以供进一步参考。",
+              "$ref": "BreakpointId"
+            },
+            {
+              "name": "locations",
+              "description": "添加后此断点解析到的位置列表。",
+              "type": "array",
+              "items": {
+                "$ref": "Location"
+              }
+            }
+          ]
+        },
+        {
+          "name": "setBreakpointOnFunctionCall",
+          "description": "在每次调用给定函数之前设置 JavaScript 断点。\n如果另一个函数是从与给定函数相同的源创建的，\n调用它也会触发断点。",
+          "experimental": true,
+          "parameters": [
+            {
+              "name": "objectId",
+              "description": "函数对象 ID。",
+              "$ref": "Runtime.RemoteObjectId"
+            },
+            {
+              "name": "condition",
+              "description": "用作断点条件的表达式。当指定时，调试器将\n如果该表达式的计算结果为 true，则在断点处停止。",
+              "optional": true,
+              "type": "string"
+            }
+          ],
+          "returns": [
+            {
+              "name": "breakpointId",
+              "description": "创建的断点的 ID 以供进一步参考。",
+              "$ref": "BreakpointId"
+            }
+          ]
+        },
+        {
+          "name": "setBreakpointsActive",
+          "description": "激活/停用页面上的所有断点。",
+          "parameters": [
+            {
+              "name": "active",
+              "description": "断点活动状态的新值。",
+              "type": "boolean"
+            }
+          ]
+        },
+        {
+          "name": "setPauseOnExceptions",
+          "description": "定义异常状态暂停。可以设置为在所有异常、未捕获的异常上停止，\n或者捕获异常，没有异常。异常状态的初始暂停为“无”。",
+          "parameters": [
+            {
+              "name": "state",
+              "description": "在异常模式下暂停。",
+              "type": "string",
+              "enum": [
+                "none",
+                "caught",
+                "uncaught",
+                "all"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "setReturnValue",
+          "description": "更改顶部框架中的返回值。仅在返回中断位置可用。",
+          "experimental": true,
+          "parameters": [
+            {
+              "name": "newValue",
+              "description": "新的返回值。",
+              "$ref": "Runtime.CallArgument"
+            }
+          ]
+        },
+        {
+          "name": "setScriptSource",
+          "description": "实时编辑 JavaScript 源代码。\n\n一般来说，当前在堆栈上的函数不能用\n一个例外：如果编辑的函数是最顶层的堆栈帧并且\n这是堆栈上该函数的唯一激活。在这种情况下\n实时编辑将会成功，并且会出现一个“Debugger.restartFrame”\n最顶层的函数会自动触发。",
+          "parameters": [
+            {
+              "name": "scriptId",
+              "description": "要编辑的脚本的 ID。",
+              "$ref": "Runtime.ScriptId"
+            },
+            {
+              "name": "scriptSource",
+              "description": "剧本的新内容。",
+              "type": "string"
+            },
+            {
+              "name": "dryRun",
+              "description": "如果为 true，则实际上不会应用更改。可以使用试运行来获得结果\n描述而不实际修改代码。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "allowTopFrameEditing",
+              "description": "如果为 true，则允许 `scriptSource` 更改堆栈顶部的函数\n只要最顶层的堆栈帧是该函数的唯一激活。",
+              "experimental": true,
+              "optional": true,
+              "type": "boolean"
+            }
+          ],
+          "returns": [
+            {
+              "name": "callFrames",
+              "description": "新的堆栈跟踪，以防虚拟机停止时发生编辑。",
+              "deprecated": true,
+              "optional": true,
+              "type": "array",
+              "items": {
+                "$ref": "CallFrame"
+              }
+            },
+            {
+              "name": "stackChanged",
+              "description": "应用更改后是否修改了当前调用堆栈。",
+              "deprecated": true,
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "asyncStackTrace",
+              "description": "异步调用栈（如果有）。",
+              "deprecated": true,
+              "optional": true,
+              "$ref": "Runtime.StackTrace"
+            },
+            {
+              "name": "asyncStackTraceId",
+              "description": "异步调用栈（如果有）。",
+              "deprecated": true,
+              "optional": true,
+              "$ref": "Runtime.StackTraceId"
+            },
+            {
+              "name": "status",
+              "description": "手术是否成功。只有“Ok”表示\n成功的实时编辑，而其他枚举变体说明了原因\n实时编辑失败。",
+              "experimental": true,
+              "type": "string",
+              "enum": [
+                "Ok",
+                "CompileError",
+                "BlockedByActiveGenerator",
+                "BlockedByActiveFunction",
+                "BlockedByTopLevelEsModuleChange"
+              ]
+            },
+            {
+              "name": "exceptionDetails",
+              "description": "异常详细信息（如果有）。仅当“status”为“CompileError”时才出现。",
+              "optional": true,
+              "$ref": "Runtime.ExceptionDetails"
+            }
+          ]
+        },
+        {
+          "name": "setSkipAllPauses",
+          "description": "使页面不会在任何暂停（断点、异常、dom 异常等）时中断。",
+          "parameters": [
+            {
+              "name": "skip",
+              "description": "跳过暂停状态的新值。",
+              "type": "boolean"
+            }
+          ]
+        },
+        {
+          "name": "setVariableValue",
+          "description": "更改调用帧中变量的值。不支持基于对象的范围，并且必须\n手动变异。",
+          "parameters": [
+            {
+              "name": "scopeNumber",
+              "description": "范围链中列出的从 0 开始的范围编号。只有“本地”、“封闭”和“捕获”\n范围类型是允许的。其他范围可以手动操作。",
+              "type": "integer"
+            },
+            {
+              "name": "variableName",
+              "description": "变量名。",
+              "type": "string"
+            },
+            {
+              "name": "newValue",
+              "description": "新变量值。",
+              "$ref": "Runtime.CallArgument"
+            },
+            {
+              "name": "callFrameId",
+              "description": "保存变量的调用框架的 ID。",
+              "$ref": "CallFrameId"
+            }
+          ]
+        },
+        {
+          "name": "stepInto",
+          "description": "单步执行函数调用。",
+          "parameters": [
+            {
+              "name": "breakOnAsyncCall",
+              "description": "调试器将暂停执行计划的第一个异步任务\n在下一次暂停之前。",
+              "experimental": true,
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "skipList",
+              "description": "SkipList 指定在步入时应跳过的位置范围。",
+              "experimental": true,
+              "optional": true,
+              "type": "array",
+              "items": {
+                "$ref": "LocationRange"
+              }
+            }
+          ]
+        },
+        {
+          "name": "stepOut",
+          "description": "跳出函数调用。"
+        },
+        {
+          "name": "stepOver",
+          "description": "跳过声明。",
+          "parameters": [
+            {
+              "name": "skipList",
+              "description": "SkipList 指定在跳过时应跳过的位置范围。",
+              "experimental": true,
+              "optional": true,
+              "type": "array",
+              "items": {
+                "$ref": "LocationRange"
+              }
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "name": "breakpointResolved",
+          "description": "当断点解析为实际脚本和位置时触发。\n已弃用，取而代之的是“scriptParsed”事件中的“resolvedBreakpoints”。",
+          "deprecated": true,
+          "parameters": [
+            {
+              "name": "breakpointId",
+              "description": "断唯一点标识符。",
+              "$ref": "BreakpointId"
+            },
+            {
+              "name": "location",
+              "description": "实际断点位置。",
+              "$ref": "Location"
+            }
+          ]
+        },
+        {
+          "name": "paused",
+          "description": "当虚拟机因断点、异常或其他停止条件而停止时触发。",
+          "parameters": [
+            {
+              "name": "callFrames",
+              "description": "虚拟机停止时的调用栈。",
+              "type": "array",
+              "items": {
+                "$ref": "CallFrame"
+              }
+            },
+            {
+              "name": "reason",
+              "description": "暂停原因。",
+              "type": "string",
+              "enum": [
+                "ambiguous",
+                "assert",
+                "CSPViolation",
+                "debugCommand",
+                "DOM",
+                "EventListener",
+                "exception",
+                "instrumentation",
+                "OOM",
+                "other",
+                "promiseRejection",
+                "XHR",
+                "step"
+              ]
+            },
+            {
+              "name": "data",
+              "description": "包含与暂停相关的辅助属性的对象。",
+              "optional": true,
+              "type": "object"
+            },
+            {
+              "name": "hitBreakpoints",
+              "description": "预定的断点ID",
+              "optional": true,
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "asyncStackTrace",
+              "description": "异步调用栈（如果有）。",
+              "optional": true,
+              "$ref": "Runtime.StackTrace"
+            },
+            {
+              "name": "asyncStackTraceId",
+              "description": "异步调用栈（如果有）。",
+              "experimental": true,
+              "optional": true,
+              "$ref": "Runtime.StackTraceId"
+            },
+            {
+              "name": "asyncCallStackTraceId",
+              "description": "不会出现，将被移除。",
+              "experimental": true,
+              "deprecated": true,
+              "optional": true,
+              "$ref": "Runtime.StackTraceId"
+            }
+          ]
+        },
+        {
+          "name": "resumed",
+          "description": "当虚拟机恢复执行时触发。"
+        },
+        {
+          "name": "scriptFailedToParse",
+          "description": "当虚拟机解析脚本失败时触发。",
+          "parameters": [
+            {
+              "name": "scriptId",
+              "description": "已解析脚本的别名。",
+              "$ref": "Runtime.ScriptId"
+            },
+            {
+              "name": "url",
+              "description": "已解析脚本的URL或名称（如有）。",
+              "type": "string"
+            },
+            {
+              "name": "startLine",
+              "description": "脚本在指定URL的资源中的行偏移量（用于脚本标签）。",
+              "type": "integer"
+            },
+            {
+              "name": "startColumn",
+              "description": "脚本在指定 URL 的资源中的列偏移量。",
+              "type": "integer"
+            },
+            {
+              "name": "endLine",
+              "description": "脚本的最后一行。",
+              "type": "integer"
+            },
+            {
+              "name": "endColumn",
+              "description": "脚本最后一行的长度。",
+              "type": "integer"
+            },
+            {
+              "name": "executionContextId",
+              "description": "指定上文描述的剧本。",
+              "$ref": "Runtime.ExecutionContextId"
+            },
+            {
+              "name": "hash",
+              "description": "活性内容分散，SHA-256。",
+              "type": "string"
+            },
+            {
+              "name": "buildId",
+              "description": "对于 Wasm 模块，为 `build_id` 自定义段的内容；对于 JavaScript，为 `debugId` 数学注释。",
+              "type": "string"
+            },
+            {
+              "name": "executionContextAuxData",
+              "description": "嵌入器特定的辅助数据可能匹配 {isDefault: boolean, type: 'default'|'isolated'|'worker', frameId: string}",
+              "optional": true,
+              "type": "object"
+            },
+            {
+              "name": "sourceMapURL",
+              "description": "脚本关联的源映射的URL（如有）。",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "hasSourceURL",
+              "description": "若该脚本包含sourceURL，则为true。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "isModule",
+              "description": "若该脚本为 ES6 模块，则为 true。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "length",
+              "description": "该长度的脚本。",
+              "optional": true,
+              "type": "integer"
+            },
+            {
+              "name": "stackTrace",
+              "description": "触发脚本解析事件的 JavaScript 栈帧（如果可用）。",
+              "experimental": true,
+              "optional": true,
+              "$ref": "Runtime.StackTrace"
+            },
+            {
+              "name": "codeOffset",
+              "description": "若语言脚本为WebAssembly，则为模块中代码段的偏移量。",
+              "experimental": true,
+              "optional": true,
+              "type": "integer"
+            },
+            {
+              "name": "scriptLanguage",
+              "description": "脚本语言。",
+              "experimental": true,
+              "optional": true,
+              "$ref": "Debugger.ScriptLanguage"
+            },
+            {
+              "name": "embedderName",
+              "description": "嵌入方提供了脚本的名称。",
+              "experimental": true,
+              "optional": true,
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "name": "scriptParsed",
+          "description": "当虚拟机解析脚本时触发。此事件也会针对所有已知和未收集的事件而触发\n启用调试器时的脚本。",
+          "parameters": [
+            {
+              "name": "scriptId",
+              "description": "已解析脚本的别名。",
+              "$ref": "Runtime.ScriptId"
+            },
+            {
+              "name": "url",
+              "description": "已解析脚本的URL或名称（如有）。",
+              "type": "string"
+            },
+            {
+              "name": "startLine",
+              "description": "脚本在指定URL的资源中的行偏移量（用于脚本标签）。",
+              "type": "integer"
+            },
+            {
+              "name": "startColumn",
+              "description": "脚本在指定 URL 的资源中的列偏移量。",
+              "type": "integer"
+            },
+            {
+              "name": "endLine",
+              "description": "脚本的最后一行。",
+              "type": "integer"
+            },
+            {
+              "name": "endColumn",
+              "description": "脚本最后一行的长度。",
+              "type": "integer"
+            },
+            {
+              "name": "executionContextId",
+              "description": "指定上文描述的剧本。",
+              "$ref": "Runtime.ExecutionContextId"
+            },
+            {
+              "name": "hash",
+              "description": "活性内容分散，SHA-256。",
+              "type": "string"
+            },
+            {
+              "name": "buildId",
+              "description": "对于 Wasm 模块，为 `build_id` 自定义段的内容；对于 JavaScript，为 `debugId` 数学注释。",
+              "type": "string"
+            },
+            {
+              "name": "executionContextAuxData",
+              "description": "嵌入器特定的辅助数据可能匹配 {isDefault: boolean, type: 'default'|'isolated'|'worker', frameId: string}",
+              "optional": true,
+              "type": "object"
+            },
+            {
+              "name": "isLiveEdit",
+              "description": "若此由脚本实时编辑生成操作，则为true。",
+              "experimental": true,
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "sourceMapURL",
+              "description": "脚本关联的源映射的URL（如有）。",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "hasSourceURL",
+              "description": "若该脚本包含sourceURL，则为true。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "isModule",
+              "description": "若该脚本为 ES6 模块，则为 true。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "length",
+              "description": "该长度的脚本。",
+              "optional": true,
+              "type": "integer"
+            },
+            {
+              "name": "stackTrace",
+              "description": "触发脚本解析事件的 JavaScript 栈帧（如果可用）。",
+              "experimental": true,
+              "optional": true,
+              "$ref": "Runtime.StackTrace"
+            },
+            {
+              "name": "codeOffset",
+              "description": "若语言脚本为WebAssembly，则为模块中代码段的偏移量。",
+              "experimental": true,
+              "optional": true,
+              "type": "integer"
+            },
+            {
+              "name": "scriptLanguage",
+              "description": "脚本语言。",
+              "experimental": true,
+              "optional": true,
+              "$ref": "Debugger.ScriptLanguage"
+            },
+            {
+              "name": "debugSymbols",
+              "description": "若脚本为WebAssembly，则为该模块的调试符号来源。",
+              "experimental": true,
+              "optional": true,
+              "type": "array",
+              "items": {
+                "$ref": "Debugger.DebugSymbols"
+              }
+            },
+            {
+              "name": "embedderName",
+              "description": "嵌入方提供了脚本的名称。",
+              "experimental": true,
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "resolvedBreakpoints",
+              "description": "如果调用“setBreakpointByUrl”，则此脚本中设置断点的列表\n匹配此脚本的 URL 或哈希。使用此列表的客户端可以忽略\n`breakpointResolved` 事件。它们是等价的。",
+              "experimental": true,
+              "optional": true,
+              "type": "array",
+              "items": {
+                "$ref": "ResolvedBreakpoint"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "domain": "HeapProfiler",
+      "experimental": true,
+      "dependencies": [
+        "Runtime"
+      ],
+      "types": [
+        {
+          "id": "HeapSnapshotObjectId",
+          "description": "堆快照对象ID。",
+          "type": "string"
+        },
+        {
+          "id": "SamplingHeapProfileNode",
+          "description": "采样分析堆节点，包含调用点信息、统计分配和子节点。",
+          "type": "object",
+          "properties": [
+            {
+              "name": "callFrame",
+              "description": "函数位置。",
+              "$ref": "Runtime.CallFrame"
+            },
+            {
+              "name": "selfSize",
+              "description": "不包括子节点的节点的分配大小（以字节为单位）。",
+              "type": "number"
+            },
+            {
+              "name": "id",
+              "description": "节点 ID。在 startSampling 和 stopSampling 之间收集的所有配置文件中，ID 都是唯一的。",
+              "type": "integer"
+            },
+            {
+              "name": "children",
+              "description": "子节点。",
+              "type": "array",
+              "items": {
+                "$ref": "SamplingHeapProfileNode"
+              }
+            }
+          ]
+        },
+        {
+          "id": "SamplingHeapProfileSample",
+          "description": "采样配置文件中的单个样本。",
+          "type": "object",
+          "properties": [
+            {
+              "name": "size",
+              "description": "归因于样本的分配大小（以字节为单位）。",
+              "type": "number"
+            },
+            {
+              "name": "nodeId",
+              "description": "对应的配置文件树节点的ID。",
+              "type": "integer"
+            },
+            {
+              "name": "ordinal",
+              "description": "按时间排序的样本序号。它在检索到的所有配置文件中都是唯一的\n在 startSampling 和 stopSampling 之间。",
+              "type": "number"
+            }
+          ]
+        },
+        {
+          "id": "SamplingHeapProfile",
+          "description": "采样剖面。",
+          "type": "object",
+          "properties": [
+            {
+              "name": "head",
+              "$ref": "SamplingHeapProfileNode"
+            },
+            {
+              "name": "samples",
+              "type": "array",
+              "items": {
+                "$ref": "SamplingHeapProfileSample"
+              }
+            }
+          ]
+        }
+      ],
+      "commands": [
+        {
+          "name": "addInspectedHeapObject",
+          "description": "使控制台能够通过 $x 引用具有给定 id 的节点（有关更多详细信息，请参阅命令行 API\n$x 函数）。",
+          "parameters": [
+            {
+              "name": "heapObjectId",
+              "description": "可通过 $x 命令行 API 访问堆快照对象 ID。",
+              "$ref": "HeapSnapshotObjectId"
+            }
+          ]
+        },
+        {
+          "name": "collectGarbage"
+        },
+        {
+          "name": "disable"
+        },
+        {
+          "name": "enable"
+        },
+        {
+          "name": "getHeapObjectId",
+          "parameters": [
+            {
+              "name": "objectId",
+              "description": "要获取其堆对象 ID 的对象的标识符。",
+              "$ref": "Runtime.RemoteObjectId"
+            }
+          ],
+          "returns": [
+            {
+              "name": "heapSnapshotObjectId",
+              "description": "传入的远程对象id对应的堆快照对象的id。",
+              "$ref": "HeapSnapshotObjectId"
+            }
+          ]
+        },
+        {
+          "name": "getObjectByHeapObjectId",
+          "parameters": [
+            {
+              "name": "objectId",
+              "$ref": "HeapSnapshotObjectId"
+            },
+            {
+              "name": "objectGroup",
+              "description": "可用于释放多个对象的符号组名称。",
+              "optional": true,
+              "type": "string"
+            }
+          ],
+          "returns": [
+            {
+              "name": "result",
+              "description": "评价结果。",
+              "$ref": "Runtime.RemoteObject"
+            }
+          ]
+        },
+        {
+          "name": "getSamplingProfile",
+          "returns": [
+            {
+              "name": "profile",
+              "description": "返回正在收集的采样配置文件。",
+              "$ref": "SamplingHeapProfile"
+            }
+          ]
+        },
+        {
+          "name": "startSampling",
+          "parameters": [
+            {
+              "name": "samplingInterval",
+              "description": "平均采样间隔（以字节为单位）。泊松分布用于间隔。的\n默认值为 32768 字节。",
+              "optional": true,
+              "type": "number"
+            },
+            {
+              "name": "stackDepth",
+              "description": "最大堆栈深度。默认值为 128。",
+              "optional": true,
+              "type": "number"
+            },
+            {
+              "name": "includeObjectsCollectedByMajorGC",
+              "description": "默认情况下，采样堆分析器仅报告以下对象：\n通过 getSamplingProfile 返回配置文件时仍处于活动状态或\nstopSampling，这对于确定哪些函数贡献非常有用\n最稳定的内存使用情况。该标志指示采样\n堆分析器还包括有关被丢弃的对象的信息\n主要GC，它将显示哪些函数导致临时内存过大\n使用情况或长时间 GC 暂停。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "includeObjectsCollectedByMinorGC",
+              "description": "默认情况下，采样堆分析器仅报告以下对象：\n通过 getSamplingProfile 返回配置文件时仍处于活动状态或\nstopSampling，这对于确定哪些函数贡献非常有用\n最稳定的内存使用情况。该标志指示采样\n堆分析器还包括有关被丢弃的对象的信息\n次要 GC，在调整延迟敏感的应用程序时非常有用\n以获得最小的 GC 活动。",
+              "optional": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        {
+          "name": "startTrackingHeapObjects",
+          "parameters": [
+            {
+              "name": "trackAllocations",
+              "optional": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        {
+          "name": "stopSampling",
+          "returns": [
+            {
+              "name": "profile",
+              "description": "记录采样堆配置文件。",
+              "$ref": "SamplingHeapProfile"
+            }
+          ]
+        },
+        {
+          "name": "stopTrackingHeapObjects",
+          "parameters": [
+            {
+              "name": "reportProgress",
+              "description": "如果为 true，则在拍摄快照时将生成“reportHeapSnapshotProgress”事件\n当跟踪停止时。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "treatGlobalObjectsAsRoots",
+              "description": "已弃用，取而代之的是 `exposeInternals`。",
+              "deprecated": true,
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "captureNumericValue",
+              "description": "如果为 true，则快照中包含数值",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "exposeInternals",
+              "description": "如果为 true，则公开快照的内部结构。",
+              "experimental": true,
+              "optional": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        {
+          "name": "takeHeapSnapshot",
+          "parameters": [
+            {
+              "name": "reportProgress",
+              "description": "如果为 true，则在拍摄快照时将生成“reportHeapSnapshotProgress”事件。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "treatGlobalObjectsAsRoots",
+              "description": "如果为 true，将生成没有人工根的原始快照。\n已弃用，取而代之的是 `exposeInternals`。",
+              "deprecated": true,
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "captureNumericValue",
+              "description": "如果为 true，则快照中包含数值",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "exposeInternals",
+              "description": "如果为 true，则公开快照的内部结构。",
+              "experimental": true,
+              "optional": true,
+              "type": "boolean"
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "name": "addHeapSnapshotChunk",
+          "parameters": [
+            {
+              "name": "chunk",
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "name": "heapStatsUpdate",
+          "description": "如果堆对象跟踪已启动，则后端可能会发送一个或多个片段的更新",
+          "parameters": [
+            {
+              "name": "statsUpdate",
+              "description": "三胞胎数组。每个三元组描述一个片段。第一个整数是片段\n索引，第二个整数是片段的对象总数，第三个整数是\n片段对象的总大小。",
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          ]
+        },
+        {
+          "name": "lastSeenObjectId",
+          "description": "如果堆对象跟踪已启动，则后端定期发送最后一个当前值\n看到的对象 ID 和相应的时间戳。如果自上次事件以来堆发生了变化\n那么一个或多个 heapStatsUpdate 事件将在新的 lastSeenObjectId 事件之前发送。",
+          "parameters": [
+            {
+              "name": "lastSeenObjectId",
+              "type": "integer"
+            },
+            {
+              "name": "timestamp",
+              "type": "number"
+            }
+          ]
+        },
+        {
+          "name": "reportHeapSnapshotProgress",
+          "parameters": [
+            {
+              "name": "done",
+              "type": "integer"
+            },
+            {
+              "name": "total",
+              "type": "integer"
+            },
+            {
+              "name": "finished",
+              "optional": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        {
+          "name": "resetProfiles"
+        }
+      ]
+    },
+    {
+      "domain": "Profiler",
+      "dependencies": [
+        "Runtime",
+        "Debugger"
+      ],
+      "types": [
+        {
+          "id": "ProfileNode",
+          "description": "配置文件节点。保存调用点信息、执行统计信息和子节点。",
+          "type": "object",
+          "properties": [
+            {
+              "name": "id",
+              "description": "节点的唯一 ID。",
+              "type": "integer"
+            },
+            {
+              "name": "callFrame",
+              "description": "函数位置。",
+              "$ref": "Runtime.CallFrame"
+            },
+            {
+              "name": "hitCount",
+              "description": "该节点位于调用堆栈顶部的样本数。",
+              "optional": true,
+              "type": "integer"
+            },
+            {
+              "name": "children",
+              "description": "子节点 ID。",
+              "optional": true,
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            {
+              "name": "deoptReason",
+              "description": "没有优化的原因。该函数可能已去优化或标记为不优化\n优化。",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "positionTicks",
+              "description": "源位置刻度数组。",
+              "optional": true,
+              "type": "array",
+              "items": {
+                "$ref": "PositionTickInfo"
+              }
+            }
+          ]
+        },
+        {
+          "id": "Profile",
+          "description": "轮廓。",
+          "type": "object",
+          "properties": [
+            {
+              "name": "nodes",
+              "description": "配置文件节点的列表。第一项是根节点。",
+              "type": "array",
+              "items": {
+                "$ref": "ProfileNode"
+              }
+            },
+            {
+              "name": "startTime",
+              "description": "分析开始时间戳（以微秒为单位）。",
+              "type": "number"
+            },
+            {
+              "name": "endTime",
+              "description": "分析结束时间戳（以微秒为单位）。",
+              "type": "number"
+            },
+            {
+              "name": "samples",
+              "description": "样本顶部节点的 ID。",
+              "optional": true,
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            {
+              "name": "timeDeltas",
+              "description": "相邻样本之间的时间间隔（以微秒为单位）。第一个增量是相对于\n配置文件开始时间。",
+              "optional": true,
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          ]
+        },
+        {
+          "id": "PositionTickInfo",
+          "description": "指定归因于特定源位置的样本数。",
+          "type": "object",
+          "properties": [
+            {
+              "name": "line",
+              "description": "源行号（从 1 开始）。",
+              "type": "integer"
+            },
+            {
+              "name": "ticks",
+              "description": "归因于源行的样本数。",
+              "type": "integer"
+            }
+          ]
+        },
+        {
+          "id": "CoverageRange",
+          "description": "源范围的覆盖数据。",
+          "type": "object",
+          "properties": [
+            {
+              "name": "startOffset",
+              "description": "范围开始的 JavaScript 脚本源偏移量。",
+              "type": "integer"
+            },
+            {
+              "name": "endOffset",
+              "description": "范围结束的 JavaScript 脚本源偏移量。",
+              "type": "integer"
+            },
+            {
+              "name": "count",
+              "description": "收集的源范围的执行计数。",
+              "type": "integer"
+            }
+          ]
+        },
+        {
+          "id": "FunctionCoverage",
+          "description": "JavaScript 函数的覆盖率数据。",
+          "type": "object",
+          "properties": [
+            {
+              "name": "functionName",
+              "description": "JavaScript 函数名称。",
+              "type": "string"
+            },
+            {
+              "name": "ranges",
+              "description": "具有覆盖数据的函数内的源范围。",
+              "type": "array",
+              "items": {
+                "$ref": "CoverageRange"
+              }
+            },
+            {
+              "name": "isBlockCoverage",
+              "description": "该函数的覆盖数据是否具有块粒度。",
+              "type": "boolean"
+            }
+          ]
+        },
+        {
+          "id": "ScriptCoverage",
+          "description": "JavaScript 脚本的覆盖率数据。",
+          "type": "object",
+          "properties": [
+            {
+              "name": "scriptId",
+              "description": "JavaScript 脚本 ID。",
+              "$ref": "Runtime.ScriptId"
+            },
+            {
+              "name": "url",
+              "description": "JavaScript 脚本名称或 url。",
+              "type": "string"
+            },
+            {
+              "name": "functions",
+              "description": "具有覆盖率数据的脚本中包含的函数。",
+              "type": "array",
+              "items": {
+                "$ref": "FunctionCoverage"
+              }
+            }
+          ]
+        }
+      ],
+      "commands": [
+        {
+          "name": "disable"
+        },
+        {
+          "name": "enable"
+        },
+        {
+          "name": "getBestEffortCoverage",
+          "description": "收集当前分离株的覆盖率数据。由于以下原因，覆盖数据可能不完整\n垃圾收集。",
+          "returns": [
+            {
+              "name": "result",
+              "description": "当前隔离的覆盖数据。",
+              "type": "array",
+              "items": {
+                "$ref": "ScriptCoverage"
+              }
+            }
+          ]
+        },
+        {
+          "name": "setSamplingInterval",
+          "description": "更改 CPU 分析器采样间隔。必须在 CPU 配置文件记录开始之前调用。",
+          "parameters": [
+            {
+              "name": "interval",
+              "description": "新的采样间隔（以微秒为单位）。",
+              "type": "integer"
+            }
+          ]
+        },
+        {
+          "name": "start"
+        },
+        {
+          "name": "startPreciseCoverage",
+          "description": "启用精确的代码覆盖率。启用精确代码之前执行的 JavaScript 的覆盖率数据\n覆盖范围可能不完整。启用可防止运行优化代码并重置执行\n柜台。",
+          "parameters": [
+            {
+              "name": "callCount",
+              "description": "收集准确的呼叫计数，而不仅仅是简单的“承保”或“未承保”。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "detailed",
+              "description": "收集基于块的覆盖范围。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "allowTriggeredUpdates",
+              "description": "允许后端主动发送更新",
+              "optional": true,
+              "type": "boolean"
+            }
+          ],
+          "returns": [
+            {
+              "name": "timestamp",
+              "description": "在后端进行覆盖更新时单调增加的时间（以秒为单位）。",
+              "type": "number"
+            }
+          ]
+        },
+        {
+          "name": "stop",
+          "returns": [
+            {
+              "name": "profile",
+              "description": "已记录的个人资料。",
+              "$ref": "Profile"
+            }
+          ]
+        },
+        {
+          "name": "stopPreciseCoverage",
+          "description": "禁用精确代码覆盖率。禁用会释放不必要的执行计数记录并允许\n执行优化的代码。"
+        },
+        {
+          "name": "takePreciseCoverage",
+          "description": "收集当前隔离的覆盖率数据，并重置执行计数器。精确的代码\n覆盖需要开始。",
+          "returns": [
+            {
+              "name": "result",
+              "description": "当前隔离的覆盖数据。",
+              "type": "array",
+              "items": {
+                "$ref": "ScriptCoverage"
+              }
+            },
+            {
+              "name": "timestamp",
+              "description": "在后端进行覆盖更新时单调增加的时间（以秒为单位）。",
+              "type": "number"
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "name": "consoleProfileFinished",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "string"
+            },
+            {
+              "name": "location",
+              "description": "console.profileEnd() 的位置。",
+              "$ref": "Debugger.Location"
+            },
+            {
+              "name": "profile",
+              "$ref": "Profile"
+            },
+            {
+              "name": "title",
+              "description": "个人资料标题作为参数传递给 console.profile()。",
+              "optional": true,
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "name": "consoleProfileStarted",
+          "description": "当使用 console.profile() 调用开始新的配置文件记录时发送。",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "string"
+            },
+            {
+              "name": "location",
+              "description": "console.profile() 的位置。",
+              "$ref": "Debugger.Location"
+            },
+            {
+              "name": "title",
+              "description": "个人资料标题作为参数传递给 console.profile()。",
+              "optional": true,
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "name": "preciseCoverageDeltaUpdate",
+          "description": "报告自上次民意调查以来的覆盖范围增量（无论是来自这样的事件，还是来自\n当前隔离的“takePreciseCoverage”。仅当代码精确时才可发送\n覆盖已经开始。该事件可以由嵌入器触发，例如：\n在某个时间点立即触发覆盖数据的收集。",
+          "experimental": true,
+          "parameters": [
+            {
+              "name": "timestamp",
+              "description": "在后端进行覆盖更新时单调增加的时间（以秒为单位）。",
+              "type": "number"
+            },
+            {
+              "name": "occasion",
+              "description": "用于区分覆盖事件的标识符。",
+              "type": "string"
+            },
+            {
+              "name": "result",
+              "description": "当前隔离的覆盖数据。",
+              "type": "array",
+              "items": {
+                "$ref": "ScriptCoverage"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "domain": "Runtime",
+      "description": "运行时域通过远程求值与镜像对象提供 JavaScript 运行时能力。求值结果以镜像对象返回，包含对象类型、字符串表示以及可用于后续引用的唯一标识符。原始对象会保留在内存中，除非显式释放或使用所在对象组中的其他对象一起释放。",
+      "types": [
+        {
+          "id": "ScriptId",
+          "description": "唯一的主演。",
+          "type": "string"
+        },
+        {
+          "id": "SerializationOptions",
+          "description": "表示序列化选项。会覆盖 `generatePreview` 与 `returnByValue`。",
+          "type": "object",
+          "properties": [
+            {
+              "name": "serialization",
+              "type": "string",
+              "enum": [
+                "deep",
+                "json",
+                "idOnly"
+              ]
+            },
+            {
+              "name": "maxDepth",
+              "description": "深序列化深度。默认为全深度。仅在“深度”序列化模式下受到尊重。",
+              "optional": true,
+              "type": "integer"
+            },
+            {
+              "name": "additionalParameters",
+              "description": "嵌入器特定参数。例如，如果连接到 Chrome 中的 V8，这些控制 DOM\n通过 `maxNodeDepth: integer` 和 `includeShadowTree: \"none\" | 进行序列化“开放”| “全部”`。\n值只能是字符串或整数类型。",
+              "optional": true,
+              "type": "object"
+            }
+          ]
+        },
+        {
+          "id": "DeepSerializedValue",
+          "description": "代表深度序列化的价值。",
+          "type": "object",
+          "properties": [
+            {
+              "name": "type",
+              "type": "string",
+              "enum": [
+                "undefined",
+                "null",
+                "string",
+                "number",
+                "boolean",
+                "bigint",
+                "regexp",
+                "date",
+                "symbol",
+                "array",
+                "object",
+                "function",
+                "map",
+                "set",
+                "weakmap",
+                "weakset",
+                "error",
+                "proxy",
+                "promise",
+                "typedarray",
+                "arraybuffer",
+                "node",
+                "window",
+                "generator"
+              ]
+            },
+            {
+              "name": "value",
+              "optional": true,
+              "type": "any"
+            },
+            {
+              "name": "objectId",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "weakLocalObjectReference",
+              "description": "设置值引用在序列化过程中是否多次遇到。在这样的\n在这种情况下，值仅提供给序列化值之一。独特\n一次 CDP 调用范围内的每个值。",
+              "optional": true,
+              "type": "integer"
+            }
+          ]
+        },
+        {
+          "id": "RemoteObjectId",
+          "description": "唯一的对象标识符。",
+          "type": "string"
+        },
+        {
+          "id": "UnserializableValue",
+          "description": "无法进行 JSON 字符串化的原始值。包括值“-0”、“NaN”、“Infinity”、\n`-Infinity` 和 bigint 文字。",
+          "type": "string"
+        },
+        {
+          "id": "RemoteObject",
+          "description": "引用原始 JavaScript 对象的镜像对象。",
+          "type": "object",
+          "properties": [
+            {
+              "name": "type",
+              "description": "对象类型。",
+              "type": "string",
+              "enum": [
+                "object",
+                "function",
+                "undefined",
+                "string",
+                "number",
+                "boolean",
+                "symbol",
+                "bigint"
+              ]
+            },
+            {
+              "name": "subtype",
+              "description": "对象子类型提示。仅指定“object”类型值。\n注意：如果您在此处更改任何内容，请确保也更新\n下面的“ObjectPreview”和“PropertyPreview”中的“subtype”。",
+              "optional": true,
+              "type": "string",
+              "enum": [
+                "array",
+                "null",
+                "node",
+                "regexp",
+                "date",
+                "map",
+                "set",
+                "weakmap",
+                "weakset",
+                "iterator",
+                "generator",
+                "error",
+                "proxy",
+                "promise",
+                "typedarray",
+                "arraybuffer",
+                "dataview",
+                "webassemblymemory",
+                "wasmvalue",
+                "trustedtype"
+              ]
+            },
+            {
+              "name": "className",
+              "description": "对象类（构造函数）名称。仅指定“object”类型值。",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "value",
+              "description": "原始值或 JSON 值（如果有请求）的远程对象值。",
+              "optional": true,
+              "type": "any"
+            },
+            {
+              "name": "unserializableValue",
+              "description": "无法进行 JSON 字符串化的原始值没有“value”，但得到了 this\n财产。",
+              "optional": true,
+              "$ref": "UnserializableValue"
+            },
+            {
+              "name": "description",
+              "description": "对象的字符串表示形式。",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "deepSerializedValue",
+              "description": "深度序列化价值。",
+              "experimental": true,
+              "optional": true,
+              "$ref": "DeepSerializedValue"
+            },
+            {
+              "name": "objectId",
+              "description": "唯一的对象标识符（对于非原始值）。",
+              "optional": true,
+              "$ref": "RemoteObjectId"
+            },
+            {
+              "name": "preview",
+              "description": "包含缩写属性值的预览。仅指定“object”类型值。",
+              "experimental": true,
+              "optional": true,
+              "$ref": "ObjectPreview"
+            },
+            {
+              "name": "customPreview",
+              "experimental": true,
+              "optional": true,
+              "$ref": "CustomPreview"
+            }
+          ]
+        },
+        {
+          "id": "CustomPreview",
+          "experimental": true,
+          "type": "object",
+          "properties": [
+            {
+              "name": "header",
+              "description": "formatter.header(object, config) 调用的 JSON 字符串化结果。\n它包含表示 RemoteObject 的 json ML 数组。",
+              "type": "string"
+            },
+            {
+              "name": "bodyGetterId",
+              "description": "如果 formatter 作为 formatter.hasBody 调用的结果返回 true，则 bodyGetterId 将\n包含返回 formatter.body(object, config) 调用结果的函数的 RemoteObjectId。\n结果值是 json ML 数组。",
+              "optional": true,
+              "$ref": "RemoteObjectId"
+            }
+          ]
+        },
+        {
+          "id": "ObjectPreview",
+          "description": "包含缩写远程对象值的对象。",
+          "experimental": true,
+          "type": "object",
+          "properties": [
+            {
+              "name": "type",
+              "description": "对象类型。",
+              "type": "string",
+              "enum": [
+                "object",
+                "function",
+                "undefined",
+                "string",
+                "number",
+                "boolean",
+                "symbol",
+                "bigint"
+              ]
+            },
+            {
+              "name": "subtype",
+              "description": "对象子类型提示。仅指定“object”类型值。",
+              "optional": true,
+              "type": "string",
+              "enum": [
+                "array",
+                "null",
+                "node",
+                "regexp",
+                "date",
+                "map",
+                "set",
+                "weakmap",
+                "weakset",
+                "iterator",
+                "generator",
+                "error",
+                "proxy",
+                "promise",
+                "typedarray",
+                "arraybuffer",
+                "dataview",
+                "webassemblymemory",
+                "wasmvalue",
+                "trustedtype"
+              ]
+            },
+            {
+              "name": "description",
+              "description": "对象的字符串表示形式。",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "overflow",
+              "description": "当且仅当原始对象的某些属性或条目不适合时为 true。",
+              "type": "boolean"
+            },
+            {
+              "name": "properties",
+              "description": "属性列表。",
+              "type": "array",
+              "items": {
+                "$ref": "PropertyPreview"
+              }
+            },
+            {
+              "name": "entries",
+              "description": "条目列表。仅指定“map”和“set”子类型值。",
+              "optional": true,
+              "type": "array",
+              "items": {
+                "$ref": "EntryPreview"
+              }
+            }
+          ]
+        },
+        {
+          "id": "PropertyPreview",
+          "experimental": true,
+          "type": "object",
+          "properties": [
+            {
+              "name": "name",
+              "description": "属性名称。",
+              "type": "string"
+            },
+            {
+              "name": "type",
+              "description": "对象类型。 Accessor 表示该属性本身是一个访问器属性。",
+              "type": "string",
+              "enum": [
+                "object",
+                "function",
+                "undefined",
+                "string",
+                "number",
+                "boolean",
+                "symbol",
+                "accessor",
+                "bigint"
+              ]
+            },
+            {
+              "name": "value",
+              "description": "用户友好的属性值字符串。",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "valuePreview",
+              "description": "嵌套值预览。",
+              "optional": true,
+              "$ref": "ObjectPreview"
+            },
+            {
+              "name": "subtype",
+              "description": "对象子类型提示。仅指定“object”类型值。",
+              "optional": true,
+              "type": "string",
+              "enum": [
+                "array",
+                "null",
+                "node",
+                "regexp",
+                "date",
+                "map",
+                "set",
+                "weakmap",
+                "weakset",
+                "iterator",
+                "generator",
+                "error",
+                "proxy",
+                "promise",
+                "typedarray",
+                "arraybuffer",
+                "dataview",
+                "webassemblymemory",
+                "wasmvalue",
+                "trustedtype"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "EntryPreview",
+          "experimental": true,
+          "type": "object",
+          "properties": [
+            {
+              "name": "key",
+              "description": "密钥的预览。指定用于类似地图的集合条目。",
+              "optional": true,
+              "$ref": "ObjectPreview"
+            },
+            {
+              "name": "value",
+              "description": "值的预览。",
+              "$ref": "ObjectPreview"
+            }
+          ]
+        },
+        {
+          "id": "PropertyDescriptor",
+          "description": "对象属性描述符。",
+          "type": "object",
+          "properties": [
+            {
+              "name": "name",
+              "description": "属性名称或符号描述。",
+              "type": "string"
+            },
+            {
+              "name": "value",
+              "description": "与属性关联的值。",
+              "optional": true,
+              "$ref": "RemoteObject"
+            },
+            {
+              "name": "writable",
+              "description": "如果与属性关联的值可以更改（仅限数据描述符），则为 True。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "get",
+              "description": "充当属性的 getter 的函数，如果没有 getter，则为“未定义”\n（仅限访问器描述符）。",
+              "optional": true,
+              "$ref": "RemoteObject"
+            },
+            {
+              "name": "set",
+              "description": "充当属性的 setter 的函数，如果没有 setter，则为“未定义”\n（仅限访问器描述符）。",
+              "optional": true,
+              "$ref": "RemoteObject"
+            },
+            {
+              "name": "configurable",
+              "description": "如果此属性描述符的类型可以更改并且该属性可以更改，则为 True\n从相应的对象中删除。",
+              "type": "boolean"
+            },
+            {
+              "name": "enumerable",
+              "description": "如果此属性在对应的属性枚举期间出现，则为 True\n对象。",
+              "type": "boolean"
+            },
+            {
+              "name": "wasThrown",
+              "description": "如果在评估过程中抛出结果，则为 True。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "isOwn",
+              "description": "如果对象拥有该属性，则为 true。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "symbol",
+              "description": "属性符号对象，如果属性是“symbol”类型。",
+              "optional": true,
+              "$ref": "RemoteObject"
+            }
+          ]
+        },
+        {
+          "id": "InternalPropertyDescriptor",
+          "description": "对象内部属性描述符。此属性通常在 JavaScript 代码中不可见。",
+          "type": "object",
+          "properties": [
+            {
+              "name": "name",
+              "description": "常规属性名称。",
+              "type": "string"
+            },
+            {
+              "name": "value",
+              "description": "与属性关联的值。",
+              "optional": true,
+              "$ref": "RemoteObject"
+            }
+          ]
+        },
+        {
+          "id": "PrivatePropertyDescriptor",
+          "description": "对象私有字段描述符。",
+          "experimental": true,
+          "type": "object",
+          "properties": [
+            {
+              "name": "name",
+              "description": "私有财产名称。",
+              "type": "string"
+            },
+            {
+              "name": "value",
+              "description": "与私有财产相关的价值。",
+              "optional": true,
+              "$ref": "RemoteObject"
+            },
+            {
+              "name": "get",
+              "description": "作为私有财产的 getter 的函数，\n如果没有 getter（仅访问器描述符），则为“undefined”。",
+              "optional": true,
+              "$ref": "RemoteObject"
+            },
+            {
+              "name": "set",
+              "description": "充当私有财产设置器的函数，\n如果没有设置器（仅访问器描述符），则为“未定义”。",
+              "optional": true,
+              "$ref": "RemoteObject"
+            }
+          ]
+        },
+        {
+          "id": "CallArgument",
+          "description": "代表函数调用参数。远程对象 ID `objectId`、原始 `value`、\n不应指定不可序列化的原始值或两者都不指定（对于未定义）。",
+          "type": "object",
+          "properties": [
+            {
+              "name": "value",
+              "description": "原始值或可序列化的 javascript 对象。",
+              "optional": true,
+              "type": "any"
+            },
+            {
+              "name": "unserializableValue",
+              "description": "无法进行 JSON 字符串化的原始值。",
+              "optional": true,
+              "$ref": "UnserializableValue"
+            },
+            {
+              "name": "objectId",
+              "description": "远程对象句柄。",
+              "optional": true,
+              "$ref": "RemoteObjectId"
+            }
+          ]
+        },
+        {
+          "id": "ExecutionContextId",
+          "description": "执行上下文的ID。",
+          "type": "integer"
+        },
+        {
+          "id": "ExecutionContextDescription",
+          "description": "描述一个与世隔绝的世界。",
+          "type": "object",
+          "properties": [
+            {
+              "name": "id",
+              "description": "执行上下文的唯一ID。它可以用来指定在哪个执行上下文中\n应执行脚本评估。",
+              "$ref": "ExecutionContextId"
+            },
+            {
+              "name": "origin",
+              "description": "执行上下文起源。",
+              "type": "string"
+            },
+            {
+              "name": "name",
+              "description": "描述给定上下文的人类可读名称。",
+              "type": "string"
+            },
+            {
+              "name": "uniqueId",
+              "description": "系统唯一的执行上下文标识符。与 id 不同，它在整个系统中是唯一的\n多个进程，因此可以可靠地用于在后端识别特定上下文\n执行跨进程导航。",
+              "experimental": true,
+              "type": "string"
+            },
+            {
+              "name": "auxData",
+              "description": "嵌入器特定的辅助数据可能匹配 {isDefault: boolean, type: 'default'|'isolated'|'worker', frameId: string}",
+              "optional": true,
+              "type": "object"
+            }
+          ]
+        },
+        {
+          "id": "ExceptionDetails",
+          "description": "有关脚本编译期间引发的异常（或错误）的详细信息或\n执行。",
+          "type": "object",
+          "properties": [
+            {
+              "name": "exceptionId",
+              "description": "异常 ID。",
+              "type": "integer"
+            },
+            {
+              "name": "text",
+              "description": "异常文本，如果可用，应与异常对象一起使用。",
+              "type": "string"
+            },
+            {
+              "name": "lineNumber",
+              "description": "异常位置的行号（从 0 开始）。",
+              "type": "integer"
+            },
+            {
+              "name": "columnNumber",
+              "description": "异常位置的列号（从 0 开始）。",
+              "type": "integer"
+            },
+            {
+              "name": "scriptId",
+              "description": "异常位置的脚本 ID。",
+              "optional": true,
+              "$ref": "ScriptId"
+            },
+            {
+              "name": "url",
+              "description": "异常位置的URL，在未报告脚本时使用。",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "stackTrace",
+              "description": "JavaScript 堆栈跟踪（如果可用）。",
+              "optional": true,
+              "$ref": "StackTrace"
+            },
+            {
+              "name": "exception",
+              "description": "异常对象（如果可用）。",
+              "optional": true,
+              "$ref": "RemoteObject"
+            },
+            {
+              "name": "executionContextId",
+              "description": "发生异常的上下文的标识符。",
+              "optional": true,
+              "$ref": "ExecutionContextId"
+            },
+            {
+              "name": "exceptionMetaData",
+              "description": "包含客户端关联的元数据条目的字典\n但除外，例如有关关联网络的信息\n请求等",
+              "experimental": true,
+              "optional": true,
+              "type": "object"
+            }
+          ]
+        },
+        {
+          "id": "Timestamp",
+          "description": "自纪元以来的毫秒数。",
+          "type": "number"
+        },
+        {
+          "id": "TimeDelta",
+          "description": "毫秒数。",
+          "type": "number"
+        },
+        {
+          "id": "CallFrame",
+          "description": "运行时错误和断言的堆栈条目。",
+          "type": "object",
+          "properties": [
+            {
+              "name": "functionName",
+              "description": "JavaScript 函数名称。",
+              "type": "string"
+            },
+            {
+              "name": "scriptId",
+              "description": "JavaScript 脚本 ID。",
+              "$ref": "ScriptId"
+            },
+            {
+              "name": "url",
+              "description": "JavaScript 脚本名称或 url。",
+              "type": "string"
+            },
+            {
+              "name": "lineNumber",
+              "description": "JavaScript 脚本行号（从 0 开始）。",
+              "type": "integer"
+            },
+            {
+              "name": "columnNumber",
+              "description": "JavaScript 脚本列号（从 0 开始）。",
+              "type": "integer"
+            }
+          ]
+        },
+        {
+          "id": "StackTrace",
+          "description": "断言或错误消息的调用帧。",
+          "type": "object",
+          "properties": [
+            {
+              "name": "description",
+              "description": "此堆栈跟踪的字符串标签。对于异步跟踪，这可能是函数的名称\n发起异步调用。",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "callFrames",
+              "description": "JavaScript 函数名称。",
+              "type": "array",
+              "items": {
+                "$ref": "CallFrame"
+              }
+            },
+            {
+              "name": "parent",
+              "description": "该堆栈之前的异步 JavaScript 堆栈跟踪（如果可用）。",
+              "optional": true,
+              "$ref": "StackTrace"
+            },
+            {
+              "name": "parentId",
+              "description": "该堆栈之前的异步 JavaScript 堆栈跟踪（如果可用）。",
+              "experimental": true,
+              "optional": true,
+              "$ref": "StackTraceId"
+            }
+          ]
+        },
+        {
+          "id": "UniqueDebuggerId",
+          "description": "当前调试器的唯一标识符。",
+          "experimental": true,
+          "type": "string"
+        },
+        {
+          "id": "StackTraceId",
+          "description": "如果设置了“debuggerId”，则堆栈跟踪来自另一个调试器，并且可以在那里解析。这个\n允许跟踪跨调试器调用。有关用法，请参阅“Runtime.StackTrace”和“Debugger.paused”。",
+          "experimental": true,
+          "type": "object",
+          "properties": [
+            {
+              "name": "id",
+              "type": "string"
+            },
+            {
+              "name": "debuggerId",
+              "optional": true,
+              "$ref": "UniqueDebuggerId"
+            }
+          ]
+        }
+      ],
+      "commands": [
+        {
+          "name": "awaitPromise",
+          "description": "使用给定的 Promise 对象 ID 将处理程序添加到 Promise。",
+          "parameters": [
+            {
+              "name": "promiseObjectId",
+              "description": "承诺的标识符。",
+              "$ref": "RemoteObjectId"
+            },
+            {
+              "name": "returnByValue",
+              "description": "结果是否为预期应按值发送的 JSON 对象。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "generatePreview",
+              "description": "是否为结果生成预览。",
+              "optional": true,
+              "type": "boolean"
+            }
+          ],
+          "returns": [
+            {
+              "name": "result",
+              "description": "承诺结果。如果承诺被拒绝，将包含拒绝值。",
+              "$ref": "RemoteObject"
+            },
+            {
+              "name": "exceptionDetails",
+              "description": "堆栈跟踪可用时的异常详细信息。",
+              "optional": true,
+              "$ref": "ExceptionDetails"
+            }
+          ]
+        },
+        {
+          "name": "callFunctionOn",
+          "description": "在给定对象上调用具有给定声明的函数。结果的对象组是\n从目标对象继承。",
+          "parameters": [
+            {
+              "name": "functionDeclaration",
+              "description": "要调用的函数的声明。",
+              "type": "string"
+            },
+            {
+              "name": "objectId",
+              "description": "要调用函数的对象的标识符。 objectId 或executionContextId 应该\n被指定。",
+              "optional": true,
+              "$ref": "RemoteObjectId"
+            },
+            {
+              "name": "arguments",
+              "description": "调用参数。所有调用参数必须与目标属于同一个 JavaScript 世界\n对象。",
+              "optional": true,
+              "type": "array",
+              "items": {
+                "$ref": "CallArgument"
+              }
+            },
+            {
+              "name": "silent",
+              "description": "在静默模式下，不会报告评估期间引发的异常，也不会暂停\n执行。覆盖 `setPauseOnException` 状态。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "returnByValue",
+              "description": "结果是否应该是应按值发送的 JSON 对象。\n可以被 `serializationOptions` 覆盖。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "generatePreview",
+              "description": "是否为结果生成预览。",
+              "experimental": true,
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "userGesture",
+              "description": "是否应将执行视为由用户在 UI 中发起。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "awaitPromise",
+              "description": "执行是否应该“等待”结果值并在等待承诺后返回\n解决了。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "executionContextId",
+              "description": "指定将使用全局对象来调用函数的执行上下文。要么\n应指定executionContextId 或objectId。",
+              "optional": true,
+              "$ref": "ExecutionContextId"
+            },
+            {
+              "name": "objectGroup",
+              "description": "可用于释放多个对象的符号组名称。如果 objectGroup 不是\n指定且objectId为，objectGroup将从object继承。",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "throwOnSideEffect",
+              "description": "若在求值期间无法排除故障，是否引发异常。",
+              "experimental": true,
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "uniqueContextId",
+              "description": "另一种指定调用函数的执行上下文的方法。\n与可以跨进程重用的 contextId 相比，这保证是\n系统唯一，因此可以用来防止意外的函数调用\n在与预期不同的上下文中（例如，作为跨流程导航的结果）\n边界）。\n这与“executionContextId”是互斥的。",
+              "experimental": true,
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "serializationOptions",
+              "description": "指定结果序列化。如果提供，则覆盖\n`generatePreview` 和 `returnByValue`。",
+              "experimental": true,
+              "optional": true,
+              "$ref": "SerializationOptions"
+            }
+          ],
+          "returns": [
+            {
+              "name": "result",
+              "description": "调用结果。",
+              "$ref": "RemoteObject"
+            },
+            {
+              "name": "exceptionDetails",
+              "description": "异常详情。",
+              "optional": true,
+              "$ref": "ExceptionDetails"
+            }
+          ]
+        },
+        {
+          "name": "compileScript",
+          "description": "编译表达式。",
+          "parameters": [
+            {
+              "name": "expression",
+              "description": "要编译的表达式。",
+              "type": "string"
+            },
+            {
+              "name": "sourceURL",
+              "description": "要为脚本设置的源 url。",
+              "type": "string"
+            },
+            {
+              "name": "persistScript",
+              "description": "指定是否应保留已编译的脚本。",
+              "type": "boolean"
+            },
+            {
+              "name": "executionContextId",
+              "description": "指定在哪个执行上下文中执行脚本运行。如果省略该参数\n评估将在检查页面的上下文中进行。",
+              "optional": true,
+              "$ref": "ExecutionContextId"
+            }
+          ],
+          "returns": [
+            {
+              "name": "scriptId",
+              "description": "脚本的 ID。",
+              "optional": true,
+              "$ref": "ScriptId"
+            },
+            {
+              "name": "exceptionDetails",
+              "description": "异常详情。",
+              "optional": true,
+              "$ref": "ExceptionDetails"
+            }
+          ]
+        },
+        {
+          "name": "disable",
+          "description": "禁用执行上下文创建的报告。"
+        },
+        {
+          "name": "discardConsoleEntries",
+          "description": "丢弃收集的异常和控制台 API 调用。"
+        },
+        {
+          "name": "enable",
+          "description": "通过“executionContextCreated”事件启用执行上下文创建报告。\n启用报告后，将立即为每个现有执行发送事件\n上下文。"
+        },
+        {
+          "name": "evaluate",
+          "description": "评估全局对象的表达式。",
+          "parameters": [
+            {
+              "name": "expression",
+              "description": "要求值的表达式。",
+              "type": "string"
+            },
+            {
+              "name": "objectGroup",
+              "description": "可用于释放多个对象的符号组名称。",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "includeCommandLineAPI",
+              "description": "确定命令行 API 在评估期间是否可用。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "silent",
+              "description": "在静默模式下，不会报告评估期间引发的异常，也不会暂停\n执行。覆盖 `setPauseOnException` 状态。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "contextId",
+              "description": "指定在哪个执行上下文中执行评估。如果省略该参数\n评估将在检查页面的上下文中进行。\n这与“uniqueContextId”是互斥的，后者提供了\n识别更可靠的执行上下文的替代方法\n在多进程环境中。",
+              "optional": true,
+              "$ref": "ExecutionContextId"
+            },
+            {
+              "name": "returnByValue",
+              "description": "结果是否为预期应按值发送的 JSON 对象。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "generatePreview",
+              "description": "是否为结果生成预览。",
+              "experimental": true,
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "userGesture",
+              "description": "是否应将执行视为由用户在 UI 中发起。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "awaitPromise",
+              "description": "执行是否应该“等待”结果值并在等待承诺后返回\n解决了。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "throwOnSideEffect",
+              "description": "若在求值期间无法排除故障，是否引发异常。\n这意味着下面的“disableBreaks”。",
+              "experimental": true,
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "timeout",
+              "description": "在超时后终止执行（毫秒）。",
+              "experimental": true,
+              "optional": true,
+              "$ref": "TimeDelta"
+            },
+            {
+              "name": "disableBreaks",
+              "description": "执行期间禁用断点。",
+              "experimental": true,
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "replMode",
+              "description": "将此标志设置为 true 可以启用“let”重新声明和顶级“await”。\n请注意，“let”变量只有在源自以下位置时才能重新声明：\n`replMode` 本身。",
+              "experimental": true,
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "allowUnsafeEvalBlockedByCSP",
+              "description": "目标的内容安全策略 (CSP) 可能会阻止“unsafe-eval”\n其中包括 eval()、Function()、setTimeout() 和 setInterval()\n当使用不可调用参数调用时。该标志为此绕过 CSP\n评估并允许不安全评估。默认为 true。",
+              "experimental": true,
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "uniqueContextId",
+              "description": "指定要评估的执行上下文的另一种方法。\n与可以跨进程重用的 contextId 相比，这保证是\n系统唯一，因此可用于防止表达式的意外求值\n在与预期不同的上下文中（例如，作为跨流程导航的结果）\n边界）。\n这与“contextId”是互斥的。",
+              "experimental": true,
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "serializationOptions",
+              "description": "指定结果序列化。如果提供，则覆盖\n`generatePreview` 和 `returnByValue`。",
+              "experimental": true,
+              "optional": true,
+              "$ref": "SerializationOptions"
+            }
+          ],
+          "returns": [
+            {
+              "name": "result",
+              "description": "评价结果。",
+              "$ref": "RemoteObject"
+            },
+            {
+              "name": "exceptionDetails",
+              "description": "异常详情。",
+              "optional": true,
+              "$ref": "ExceptionDetails"
+            }
+          ]
+        },
+        {
+          "name": "getIsolateId",
+          "description": "返回隔离 ID。",
+          "experimental": true,
+          "returns": [
+            {
+              "name": "id",
+              "description": "隔离 ID。",
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "name": "getHeapUsage",
+          "description": "返回 JavaScript 堆使用情况。\n它是不限于特定运行时的相应隔离的总使用量。",
+          "experimental": true,
+          "returns": [
+            {
+              "name": "usedSize",
+              "description": "使用的 JavaScript 堆大小（以字节为单位）。",
+              "type": "number"
+            },
+            {
+              "name": "totalSize",
+              "description": "分配的 JavaScript 堆大小（以字节为单位）。",
+              "type": "number"
+            },
+            {
+              "name": "embedderHeapUsedSize",
+              "description": "嵌入器的垃圾收集堆中已使用的大小（以字节为单位）。",
+              "type": "number"
+            },
+            {
+              "name": "backingStorageSize",
+              "description": "数组缓冲区和外部字符串的后备存储大小（以字节为单位）。",
+              "type": "number"
+            }
+          ]
+        },
+        {
+          "name": "getProperties",
+          "description": "返回给定对象的属性。结果的对象组继承自目标\n对象。",
+          "parameters": [
+            {
+              "name": "objectId",
+              "description": "要为其返回属性的对象的标识符。",
+              "$ref": "RemoteObjectId"
+            },
+            {
+              "name": "ownProperties",
+              "description": "如果为 true，则返回仅属于元素本身的属性，而不属于其原型\n链。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "accessorPropertiesOnly",
+              "description": "如果为 true，则仅返回访问器属性（带有 getter/setter）；内部属性不是\n要么回来了。",
+              "experimental": true,
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "generatePreview",
+              "description": "是否应生成结果预览。",
+              "experimental": true,
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "nonIndexedPropertiesOnly",
+              "description": "如果为 true，则仅返回非索引属性。",
+              "experimental": true,
+              "optional": true,
+              "type": "boolean"
+            }
+          ],
+          "returns": [
+            {
+              "name": "result",
+              "description": "对象属性。",
+              "type": "array",
+              "items": {
+                "$ref": "PropertyDescriptor"
+              }
+            },
+            {
+              "name": "internalProperties",
+              "description": "内部对象属性（仅元素本身的属性）。",
+              "optional": true,
+              "type": "array",
+              "items": {
+                "$ref": "InternalPropertyDescriptor"
+              }
+            },
+            {
+              "name": "privateProperties",
+              "description": "对象私有属性。",
+              "experimental": true,
+              "optional": true,
+              "type": "array",
+              "items": {
+                "$ref": "PrivatePropertyDescriptor"
+              }
+            },
+            {
+              "name": "exceptionDetails",
+              "description": "异常详情。",
+              "optional": true,
+              "$ref": "ExceptionDetails"
+            }
+          ]
+        },
+        {
+          "name": "globalLexicalScopeNames",
+          "description": "返回全局范围内的所有 let、const 和 class 变量。",
+          "parameters": [
+            {
+              "name": "executionContextId",
+              "description": "指定在哪个执行上下文中查找全局范围变量。",
+              "optional": true,
+              "$ref": "ExecutionContextId"
+            }
+          ],
+          "returns": [
+            {
+              "name": "names",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        {
+          "name": "queryObjects",
+          "parameters": [
+            {
+              "name": "prototypeObjectId",
+              "description": "返回对象的原型的标识符。",
+              "$ref": "RemoteObjectId"
+            },
+            {
+              "name": "objectGroup",
+              "description": "可用于发布结果的符号组名称。",
+              "optional": true,
+              "type": "string"
+            }
+          ],
+          "returns": [
+            {
+              "name": "objects",
+              "description": "带有对象的数组。",
+              "$ref": "RemoteObject"
+            }
+          ]
+        },
+        {
+          "name": "releaseObject",
+          "description": "释放具有给定 ID 的远程对象。",
+          "parameters": [
+            {
+              "name": "objectId",
+              "description": "要释放的对象的标识符。",
+              "$ref": "RemoteObjectId"
+            }
+          ]
+        },
+        {
+          "name": "releaseObjectGroup",
+          "description": "释放属于给定组的所有远程对象。",
+          "parameters": [
+            {
+              "name": "objectGroup",
+              "description": "符号对象组名称。",
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "name": "runIfWaitingForDebugger",
+          "description": "如果正在等待调试器附加，则告诉检查的实例运行。"
+        },
+        {
+          "name": "runScript",
+          "description": "在给定上下文中运行具有给定 id 的脚本。",
+          "parameters": [
+            {
+              "name": "scriptId",
+              "description": "要运行的脚本的 ID。",
+              "$ref": "ScriptId"
+            },
+            {
+              "name": "executionContextId",
+              "description": "指定在哪个执行上下文中执行脚本运行。如果省略该参数\n评估将在检查页面的上下文中进行。",
+              "optional": true,
+              "$ref": "ExecutionContextId"
+            },
+            {
+              "name": "objectGroup",
+              "description": "可用于释放多个对象的符号组名称。",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "silent",
+              "description": "在静默模式下，不会报告评估期间引发的异常，也不会暂停\n执行。覆盖 `setPauseOnException` 状态。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "includeCommandLineAPI",
+              "description": "确定命令行 API 在评估期间是否可用。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "returnByValue",
+              "description": "结果是否应该是应按值发送的 JSON 对象。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "generatePreview",
+              "description": "是否为结果生成预览。",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "awaitPromise",
+              "description": "执行是否应该“等待”结果值并在等待承诺后返回\n解决了。",
+              "optional": true,
+              "type": "boolean"
+            }
+          ],
+          "returns": [
+            {
+              "name": "result",
+              "description": "运行结果。",
+              "$ref": "RemoteObject"
+            },
+            {
+              "name": "exceptionDetails",
+              "description": "异常详情。",
+              "optional": true,
+              "$ref": "ExceptionDetails"
+            }
+          ]
+        },
+        {
+          "name": "setAsyncCallStackDepth",
+          "description": "启用或禁用异步调用堆栈跟踪。",
+          "redirect": "Debugger",
+          "parameters": [
+            {
+              "name": "maxDepth",
+              "description": "异步调用堆栈的最大深度。设置为“0”将有效禁用异步收集\n调用堆栈（默认）。",
+              "type": "integer"
+            }
+          ]
+        },
+        {
+          "name": "setCustomObjectFormatterEnabled",
+          "experimental": true,
+          "parameters": [
+            {
+              "name": "enabled",
+              "type": "boolean"
+            }
+          ]
+        },
+        {
+          "name": "setMaxCallStackSizeToCapture",
+          "experimental": true,
+          "parameters": [
+            {
+              "name": "size",
+              "type": "integer"
+            }
+          ]
+        },
+        {
+          "name": "terminateExecution",
+          "description": "终止当前或下一个 JavaScript 执行。\n当最外层脚本执行结束时将取消终止。",
+          "experimental": true
+        },
+        {
+          "name": "addBinding",
+          "description": "如果executionContextId为空，则添加与给定名称的绑定\n所有检查上下文的全局对象，包括后来创建的对象，\n绑定在重新加载后仍然存在。\n绑定函数只接受一个参数，该参数应该是字符串，\n如果有任何其他输入，函数将引发异常。\n每个绑定函数调用都会生成 Runtime.bindingCalled 通知。",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "name": "executionContextId",
+              "description": "如果指定，则绑定只会暴露给指定的\n执行上下文。如果省略并且未设置“executionContextName”，\n绑定暴露给目标的所有执行上下文。\n此参数与“executionContextName”互斥。\n由于用例不明确，已弃用，转而使用“executionContextName”\n以及实施中的错误（crbug.com/1169639）。 `executionContextId` 将是\n将来删除。",
+              "experimental": true,
+              "deprecated": true,
+              "optional": true,
+              "$ref": "ExecutionContextId"
+            },
+            {
+              "name": "executionContextName",
+              "description": "如果指定，绑定将暴露给executionContext\n匹配名称，即使对于添加绑定后创建的上下文也是如此。\n另请参阅“ExecutionContext.name”和“worldName”参数\n`Page.addScriptToEvaluateOnNewDocument`。\n该参数与“executionContextId”互斥。",
+              "optional": true,
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "name": "removeBinding",
+          "description": "此方法不会从全局对象中删除绑定函数，而是\n从 Runtime.bindingCalled 通知中取消订阅当前运行时代理。",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "name": "getExceptionDetails",
+          "description": "此方法尝试查找并填充异常详细信息\nJavaScript 错误对象。\n请注意，生成的异常详细信息的 stackTrace 部分将\n仅当运行时域在运行时启用时才会被填充\n抛出了错误。",
+          "experimental": true,
+          "parameters": [
+            {
+              "name": "errorObjectId",
+              "description": "要解决其异常详细信息的错误对象。",
+              "$ref": "RemoteObjectId"
+            }
+          ],
+          "returns": [
+            {
+              "name": "exceptionDetails",
+              "optional": true,
+              "$ref": "ExceptionDetails"
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "name": "bindingCalled",
+          "description": "绑定绑定被调用时都会发出通知。",
+          "experimental": true,
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "name": "payload",
+              "type": "string"
+            },
+            {
+              "name": "executionContextId",
+              "description": "进行调用的上下文的标识符。",
+              "$ref": "ExecutionContextId"
+            }
+          ]
+        },
+        {
+          "name": "consoleAPICalled",
+          "description": "当调用Console API时触发。",
+          "parameters": [
+            {
+              "name": "type",
+              "description": "调用类型。",
+              "type": "string",
+              "enum": [
+                "log",
+                "debug",
+                "info",
+                "error",
+                "warning",
+                "dir",
+                "dirxml",
+                "table",
+                "trace",
+                "clear",
+                "startGroup",
+                "startGroupCollapsed",
+                "endGroup",
+                "assert",
+                "profile",
+                "profileEnd",
+                "count",
+                "timeEnd"
+              ]
+            },
+            {
+              "name": "args",
+              "description": "调用参数。",
+              "type": "array",
+              "items": {
+                "$ref": "RemoteObject"
+              }
+            },
+            {
+              "name": "executionContextId",
+              "description": "进行调用的上下文的标识符。",
+              "$ref": "ExecutionContextId"
+            },
+            {
+              "name": "timestamp",
+              "description": "呼叫时间戳。",
+              "$ref": "Timestamp"
+            },
+            {
+              "name": "stackTrace",
+              "description": "调用时捕获的堆栈跟踪。自动报告异步堆栈链\n以下调用类型：`assert`、`error`、`trace`、`warning`。对于其他类型的异步调用\n可以使用“Debugger.getStackTrace”和“stackTrace.parentId”字段检索链。",
+              "optional": true,
+              "$ref": "StackTrace"
+            },
+            {
+              "name": "context",
+              "description": "用于在非默认控制台上下文（不是 console.*）上调用的控制台上下文描述符：\n'anonymous#unique-logger-id' 用于调用未命名上下文，'name#unique-logger-id' 用于调用\n在命名上下文上。",
+              "experimental": true,
+              "optional": true,
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "name": "exceptionRevoked",
+          "description": "当未处理的异常被撤销时发出。",
+          "parameters": [
+            {
+              "name": "reason",
+              "description": "描述为何例外被撤销的原因。",
+              "type": "string"
+            },
+            {
+              "name": "exceptionId",
+              "description": "已撤销异常的 ID，如“exceptionThrown”中所报告。",
+              "type": "integer"
+            }
+          ]
+        },
+        {
+          "name": "exceptionThrown",
+          "description": "当异常被抛出且未处理时发出。",
+          "parameters": [
+            {
+              "name": "timestamp",
+              "description": "异常的时间戳。",
+              "$ref": "Timestamp"
+            },
+            {
+              "name": "exceptionDetails",
+              "$ref": "ExceptionDetails"
+            }
+          ]
+        },
+        {
+          "name": "executionContextCreated",
+          "description": "创建新的执行上下文时发出。",
+          "parameters": [
+            {
+              "name": "context",
+              "description": "新创建的执行上下文。",
+              "$ref": "ExecutionContextDescription"
+            }
+          ]
+        },
+        {
+          "name": "executionContextDestroyed",
+          "description": "当执行上下文被销毁时发出。",
+          "parameters": [
+            {
+              "name": "executionContextId",
+              "description": "被破坏上下文的ID",
+              "deprecated": true,
+              "$ref": "ExecutionContextId"
+            },
+            {
+              "name": "executionContextUniqueId",
+              "description": "被破坏上下文的唯一ID",
+              "experimental": true,
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "name": "executionContextsCleared",
+          "description": "当浏览器中清除所有executionContexts时发出"
+        },
+        {
+          "name": "inspectRequested",
+          "description": "当应该检查对象时发出（例如，作为检查（）命令行API的结果\n打电话）。",
+          "parameters": [
+            {
+              "name": "object",
+              "$ref": "RemoteObject"
+            },
+            {
+              "name": "hints",
+              "type": "object"
+            },
+            {
+              "name": "executionContextId",
+              "description": "进行调用的上下文的标识符。",
+              "experimental": true,
+              "optional": true,
+              "$ref": "ExecutionContextId"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "domain": "Schema",
+      "description": "该域已废弃。",
+      "deprecated": true,
+      "types": [
+        {
+          "id": "Domain",
+          "description": "协议域的描述。",
+          "type": "object",
+          "properties": [
+            {
+              "name": "name",
+              "description": "域名。",
+              "type": "string"
+            },
+            {
+              "name": "version",
+              "description": "域版本。",
+              "type": "string"
+            }
+          ]
+        }
+      ],
+      "commands": [
+        {
+          "name": "getDomains",
+          "description": "返回支持的域。",
+          "returns": [
+            {
+              "name": "domains",
+              "description": "支持的域列表。",
+              "type": "array",
+              "items": {
+                "$ref": "Domain"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
